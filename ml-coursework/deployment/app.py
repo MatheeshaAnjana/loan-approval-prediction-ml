@@ -7,19 +7,16 @@ app = Flask(__name__)
 model = joblib.load("model.pkl")
 scaler = joblib.load("scaler.pkl")
 
+# Column order MUST match the order used when the scaler/model were trained
 FEATURE_COLUMNS = [
-    'Gender',
-    'Married',
-    'Dependents',
-    'Education',
-    'Self_Employed',
-    'ApplicantIncome',
     'CoapplicantIncome',
+    'TotalIncome',
+    'ApplicantIncome',
     'LoanAmount',
-    'Loan_Amount_Term',
     'Credit_History',
-    'Property_Area',
-    'TotalIncome'
+    'Loan_Amount_Term',
+    'Education',
+    'Married'
 ]
 
 
@@ -33,33 +30,25 @@ def predict():
     form = request.form
 
     try:
-        gender = float(form.get("Gender"))
         married = float(form.get("Married"))
-        dependents = float(form.get("Dependents"))
         education = float(form.get("Education"))
-        self_employed = float(form.get("Self_Employed"))
         applicant_income = float(form.get("ApplicantIncome"))
         coapplicant_income = float(form.get("CoapplicantIncome"))
         loan_amount = float(form.get("LoanAmount"))
         loan_amount_term = float(form.get("Loan_Amount_Term"))
         credit_history = float(form.get("Credit_History"))
-        property_area = float(form.get("Property_Area"))
 
         total_income = applicant_income + coapplicant_income
 
         sample = pd.DataFrame([[
-            gender,
-            married,
-            dependents,
-            education,
-            self_employed,
-            applicant_income,
             coapplicant_income,
+            total_income,
+            applicant_income,
             loan_amount,
-            loan_amount_term,
             credit_history,
-            property_area,
-            total_income
+            loan_amount_term,
+            education,
+            married
         ]], columns=FEATURE_COLUMNS)
 
         sample_scaled = scaler.transform(sample)
