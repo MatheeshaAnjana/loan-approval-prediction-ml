@@ -4,86 +4,143 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Loan Approval Predictor</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-  <div class="container">
-    <header>
-      <h1>Loan Approval Predictor</h1>
-      <p class="subtitle">Fill in the applicant details below to get an instant prediction.</p>
-    </header>
 
-    {% if result %}
-      <div class="result-card {{ 'approved' if result.approved else 'rejected' if result.approved is not none else 'error' }}">
-        {% if result.approved is none %}
-          <span class="icon">⚠️</span>
-        {% elif result.approved %}
-          <span class="icon">✅</span>
-        {% else %}
-          <span class="icon">❌</span>
-        {% endif %}
-        <span class="result-text">{{ result.message }}</span>
-      </div>
-    {% endif %}
+  <div class="bg-orb orb-1"></div>
+  <div class="bg-orb orb-2"></div>
 
-    <form method="POST" action="/predict" class="loan-form">
-      <div class="form-grid">
+  <div class="page">
+    <div class="card">
+      <header class="card-header">
+        <div class="badge">
+          <span class="badge-dot"></span>
+          Instant Decision
+        </div>
+        <h1>Loan Approval Predictor</h1>
+        <p class="subtitle">Enter the applicant's details to get an instant decision.</p>
+      </header>
 
-        <div class="form-group">
-          <label for="Married">Married</label>
-          <select name="Married" id="Married" required>
-            <option value="" disabled {% if not form_data %}selected{% endif %}>Select</option>
-            <option value="1" {% if form_data and form_data.Married == '1' %}selected{% endif %}>Yes</option>
-            <option value="0" {% if form_data and form_data.Married == '0' %}selected{% endif %}>No</option>
-          </select>
+      <form method="POST" action="/predict" class="loan-form" id="loanForm">
+        <div class="form-group full-width">
+          <label for="ApplicantName">Full Name</label>
+          <input type="text" name="ApplicantName" id="ApplicantName"
+                 value="{{ form_data.ApplicantName if form_data else '' }}"
+                 placeholder="e.g. Matheesha Amarathunga" required>
         </div>
 
-        <div class="form-group">
-          <label for="Education">Education</label>
-          <select name="Education" id="Education" required>
-            <option value="" disabled {% if not form_data %}selected{% endif %}>Select</option>
-            <option value="1" {% if form_data and form_data.Education == '1' %}selected{% endif %}>Graduate</option>
-            <option value="0" {% if form_data and form_data.Education == '0' %}selected{% endif %}>Not Graduate</option>
-          </select>
+        <div class="form-grid">
+
+          <div class="form-group">
+            <label for="Married">Married</label>
+            <select name="Married" id="Married" required>
+              <option value="" disabled {% if not form_data %}selected{% endif %}>Select</option>
+              <option value="1" {% if form_data and form_data.Married == '1' %}selected{% endif %}>Yes</option>
+              <option value="0" {% if form_data and form_data.Married == '0' %}selected{% endif %}>No</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="Education">Education</label>
+            <select name="Education" id="Education" required>
+              <option value="" disabled {% if not form_data %}selected{% endif %}>Select</option>
+              <option value="1" {% if form_data and form_data.Education == '1' %}selected{% endif %}>Graduate</option>
+              <option value="0" {% if form_data and form_data.Education == '0' %}selected{% endif %}>Not Graduate</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="ApplicantIncome">Applicant Income</label>
+            <input type="number" step="any" min="0" name="ApplicantIncome" id="ApplicantIncome"
+                   value="{{ form_data.ApplicantIncome if form_data else '' }}" placeholder="e.g. 5000" required>
+          </div>
+
+          <div class="form-group">
+            <label for="CoapplicantIncome">Coapplicant Income</label>
+            <input type="number" step="any" min="0" name="CoapplicantIncome" id="CoapplicantIncome"
+                   value="{{ form_data.CoapplicantIncome if form_data else '' }}" placeholder="e.g. 0" required>
+          </div>
+
+          <div class="form-group">
+            <label for="LoanAmount">Loan Amount</label>
+            <input type="number" step="any" min="0" name="LoanAmount" id="LoanAmount"
+                   value="{{ form_data.LoanAmount if form_data else '' }}" placeholder="e.g. 120" required>
+          </div>
+
+          <div class="form-group">
+            <label for="Loan_Amount_Term">Loan Term (days)</label>
+            <input type="number" step="any" min="0" name="Loan_Amount_Term" id="Loan_Amount_Term"
+                   value="{{ form_data.Loan_Amount_Term if form_data else '' }}" placeholder="e.g. 360" required>
+          </div>
+
+          <div class="form-group full-width">
+            <label for="Credit_History">Credit History</label>
+            <select name="Credit_History" id="Credit_History" required>
+              <option value="" disabled {% if not form_data %}selected{% endif %}>Select</option>
+              <option value="1" {% if form_data and form_data.Credit_History == '1' %}selected{% endif %}>Good</option>
+              <option value="0" {% if form_data and form_data.Credit_History == '0' %}selected{% endif %}>Bad</option>
+            </select>
+          </div>
+
         </div>
 
-        <div class="form-group">
-          <label for="ApplicantIncome">Applicant Income</label>
-          <input type="number" step="any" min="0" name="ApplicantIncome" id="ApplicantIncome"
-                 value="{{ form_data.ApplicantIncome if form_data else '' }}" placeholder="e.g. 5000" required>
-        </div>
-
-        <div class="form-group">
-          <label for="CoapplicantIncome">Coapplicant Income</label>
-          <input type="number" step="any" min="0" name="CoapplicantIncome" id="CoapplicantIncome"
-                 value="{{ form_data.CoapplicantIncome if form_data else '' }}" placeholder="e.g. 0" required>
-        </div>
-
-        <div class="form-group">
-          <label for="LoanAmount">Loan Amount</label>
-          <input type="number" step="any" min="0" name="LoanAmount" id="LoanAmount"
-                 value="{{ form_data.LoanAmount if form_data else '' }}" placeholder="e.g. 128" required>
-        </div>
-
-        <div class="form-group">
-          <label for="Loan_Amount_Term">Loan Amount Term (days)</label>
-          <input type="number" step="any" min="0" name="Loan_Amount_Term" id="Loan_Amount_Term"
-                 value="{{ form_data.Loan_Amount_Term if form_data else '' }}" placeholder="e.g. 360" required>
-        </div>
-
-        <div class="form-group">
-          <label for="Credit_History">Credit History</label>
-          <select name="Credit_History" id="Credit_History" required>
-            <option value="" disabled {% if not form_data %}selected{% endif %}>Select</option>
-            <option value="1" {% if form_data and form_data.Credit_History == '1' %}selected{% endif %}>Good</option>
-            <option value="0" {% if form_data and form_data.Credit_History == '0' %}selected{% endif %}>Bad</option>
-          </select>
-        </div>
-
-      </div>
-
-      <button type="submit" class="submit-btn">Predict</button>
-    </form>
+        <button type="submit" class="submit-btn">
+          <span>Check Eligibility</span>
+        </button>
+      </form>
+    </div>
   </div>
+
+  {% if result %}
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal {{ 'approved' if result.approved else 'rejected' if result.approved is not none else 'warning' }}" id="modalCard">
+      <button class="modal-close" id="modalClose" aria-label="Close">&times;</button>
+
+      <div class="modal-icon">
+        {% if result.approved is none %}
+          <svg viewBox="0 0 24 24" fill="none"><path d="M12 9v4M12 17h.01M10.29 3.86l-8.18 14.18A1.5 1.5 0 0 0 3.42 20h17.16a1.5 1.5 0 0 0 1.31-2.24L13.71 3.86a1.5 1.5 0 0 0-2.62 0z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        {% elif result.approved %}
+          <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.8"/><path class="check-path" d="M8 12.5l2.8 2.8L16 9.8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        {% else %}
+          <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.8"/><path class="cross-path" d="M9 9l6 6M15 9l-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        {% endif %}
+      </div>
+
+      <p class="modal-eyebrow">
+        {% if result.approved is none %}Almost there{% elif result.approved %}Decision ready{% else %}Decision ready{% endif %}
+      </p>
+      <h2 class="modal-name">{{ result.name }}</h2>
+      <h3 class="modal-message">{{ result.message }}</h3>
+      <p class="modal-description">{{ result.description }}</p>
+
+      <button class="modal-action" id="modalAction">Got it</button>
+    </div>
+  </div>
+  {% endif %}
+
+  <script>
+    const overlay = document.getElementById('modalOverlay');
+    const closeBtn = document.getElementById('modalClose');
+    const actionBtn = document.getElementById('modalAction');
+
+    function closeModal() {
+      if (!overlay) return;
+      overlay.classList.add('closing');
+      setTimeout(() => overlay.remove(), 250);
+    }
+
+    if (overlay) {
+      requestAnimationFrame(() => overlay.classList.add('visible'));
+      closeBtn.addEventListener('click', closeModal);
+      actionBtn.addEventListener('click', closeModal);
+      overlay.addEventListener('click', (e) => {
+        if (e.target === overlay) closeModal();
+      });
+    }
+  </script>
 </body>
 </html>
